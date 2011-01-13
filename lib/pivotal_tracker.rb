@@ -1,30 +1,37 @@
-require 'hpricot'
+require 'nokogiri'
 require 'net/http'
 require 'uri'
 
-TOKEN = '6f23b318f92337792996c9d4e1fb6ed7'
-PROJECT_ID = '198977'
-
 class PivotalTracker
+  API_BASE_URI = "http://www.pivotaltracker.com/services/v3/"
+  TOKEN        = '6f23b318f92337792996c9d4e1fb6ed7'
+  PROJECT_ID   = '198977'
+
   def initialize(output)
     @output = output
   end
 
   def status
-    resource_uri = URI.parse("http://www.pivotaltracker.com/services/v3/projects/#{PROJECT_ID}")
-    response = Net::HTTP.start(resource_uri.host, resource_uri.port) do |http|
-      http.get(resource_uri.path, {'X-TrackerToken' => TOKEN})
+    response = api_request("#{API_BASE_URI}projects/#{PROJECT_ID}")
+
+    projects = []
+    response.xpath('project').each do |project|
+      projects << {
+        :name             => project.xpath('name').text,
+        :iteration_length => project.xpath('iteration_length').text
+      }
     end
 
-    doc = Hpricot(response.body).at('project')
+    @output.puts "#{projects}"
+  end
 
-    @project = {
-      :name             => doc.at('name').innerHTML,
-      :iteration_length => doc.at('iteration_length').innerHTML,
-      :week_start_day   => doc.at('week_start_day').innerHTML,
-      :point_scale      => doc.at('point_scale').innerHTML
-    }
+  private
 
-    @output.puts "#{@project}"
+  def api_request(url)
+    resource_uri = URI.parse(url)
+    Net::HTTP.start(resource_uri.host, resource_uri.port) do |http|
+      response = http.get(resource_uri.path, { 'X-TrackerToken' => TOKEN })
+      Nokogiri::XML(response.body)
+    end
   end
 end
