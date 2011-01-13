@@ -17,15 +17,36 @@ class PivotalTracker
     projects = []
     response.xpath('project').each do |project|
       projects << {
+        :id               => project.xpath('id').text,
         :name             => project.xpath('name').text,
-        :iteration_length => project.xpath('iteration_length').text
+        :iteration_length => project.xpath('iteration_length').text,
+        :current_velocity => project.xpath('current_velocity').text
       }
     end
 
-    @output.puts "#{projects}"
+    column_widths = [10, 30, 10]
+    print_project_status_header(projects, column_widths)
+    projects.each { |project| print_project_line(project, column_widths) }
+    @output.puts ""
   end
 
   private
+
+  def print_project_status_header(projects, column_widths)
+    @output.puts ""
+    @output.print "id".ljust(column_widths[0])
+    @output.print "project".ljust(column_widths[1])
+    @output.print "velocity".ljust(column_widths[2])
+    @output.puts ""
+    60.times { |num| @output.print "-" }
+    @output.puts ""
+  end
+
+  def print_project_line(project, column_widths)
+    @output.print project[:id].ljust(column_widths[0])
+    @output.print project[:name].ljust(column_widths[1])
+    @output.print project[:current_velocity].ljust(column_widths[2])
+  end
 
   def api_request(url)
     resource_uri = URI.parse(url)
