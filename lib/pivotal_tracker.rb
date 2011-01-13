@@ -5,17 +5,16 @@ require 'uri'
 class PivotalTracker
   API_BASE_URI = "http://www.pivotaltracker.com/services/v3/"
   TOKEN        = '6f23b318f92337792996c9d4e1fb6ed7'
-  PROJECT_ID   = '198977'
 
   def initialize(output)
     @output = output
   end
 
   def status
-    response = api_request("#{API_BASE_URI}projects/#{PROJECT_ID}")
+    response = api_request("#{API_BASE_URI}projects")
 
     projects = []
-    response.xpath('project').each do |project|
+    response.xpath('projects/project').each do |project|
       projects << {
         :id               => project.xpath('id').text,
         :name             => project.xpath('name').text,
@@ -27,7 +26,6 @@ class PivotalTracker
     column_widths = [10, 30, 10]
     print_project_status_header(projects, column_widths)
     projects.each { |project| print_project_line(project, column_widths) }
-    @output.puts ""
   end
 
   private
@@ -46,6 +44,7 @@ class PivotalTracker
     @output.print project[:id].ljust(column_widths[0])
     @output.print project[:name].ljust(column_widths[1])
     @output.print project[:current_velocity].ljust(column_widths[2])
+    @output.puts ""
   end
 
   def api_request(url)
