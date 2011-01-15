@@ -6,6 +6,7 @@ X * Set up RSpec
 X * Swap out Nokogiri for hpricot
 X * Get list of projects with their IDs
 * Get velocity for a given project by ID
+* Memoize projects method
 * Get status for a single project (based on next deadline)
 * Get status for all projects
 * Get list of all upcoming deadlines

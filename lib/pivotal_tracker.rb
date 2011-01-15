@@ -1,57 +1,61 @@
 require 'nokogiri'
-require 'net/http'
-require 'uri'
+require 'httparty'
 
 class PivotalTracker
-  API_BASE_URI = "http://www.pivotaltracker.com/services/v3/"
-  TOKEN        = '6f23b318f92337792996c9d4e1fb6ed7'
+  include HTTParty
+
+  base_uri "www.pivotaltracker.com/services/v3"
+  format :xml
 
   def initialize(output)
     @output = output
   end
 
+  def api_request(path, query = {})
+    PivotalTracker.get(path,
+      :headers => {
+        "X-TrackerToken" => "6f23b318f92337792996c9d4e1fb6ed7"
+      },
+      :query => query
+    )
+  end
+
+  def projects
+    api_request("/projects").parsed_response["projects"]
+  end
+
   def status
-    response = api_request("#{API_BASE_URI}projects")
+    column_widths = [10, 30, 10, 8]
 
-    projects = []
-    response.xpath('projects/project').each do |project|
-      projects << {
-        :id               => project.xpath('id').text,
-        :name             => project.xpath('name').text,
-        :iteration_length => project.xpath('iteration_length').text,
-        :current_velocity => project.xpath('current_velocity').text
-      }
-    end
-
-    column_widths = [10, 30, 10]
     print_project_status_header(projects, column_widths)
     projects.each { |project| print_project_line(project, column_widths) }
   end
 
   private
 
+  def next_deadline(project)
+    # response = api_request("#{API_BASE_URI}projects/#{project[:id]}/iterations")
+    #     puts response
+    # return response.xpath("2011-01-20"
+    "2011-01-20"
+  end
+
   def print_project_status_header(projects, column_widths)
     @output.puts ""
     @output.print "id".ljust(column_widths[0])
     @output.print "project".ljust(column_widths[1])
     @output.print "velocity".ljust(column_widths[2])
+    @output.print "next deadline".ljust(column_widths[3])
     @output.puts ""
     60.times { |num| @output.print "-" }
     @output.puts ""
   end
 
   def print_project_line(project, column_widths)
-    @output.print project[:id].ljust(column_widths[0])
-    @output.print project[:name].ljust(column_widths[1])
-    @output.print project[:current_velocity].ljust(column_widths[2])
+    @output.print project["id"].ljust(column_widths[0])
+    @output.print project["name"].ljust(column_widths[1])
+    @output.print project["current_velocity"].ljust(column_widths[2])
+    @output.print next_deadline(project).ljust(column_widths[3])
     @output.puts ""
-  end
-
-  def api_request(url)
-    resource_uri = URI.parse(url)
-    Net::HTTP.start(resource_uri.host, resource_uri.port) do |http|
-      response = http.get(resource_uri.path, { 'X-TrackerToken' => TOKEN })
-      Nokogiri::XML(response.body)
-    end
   end
 end
