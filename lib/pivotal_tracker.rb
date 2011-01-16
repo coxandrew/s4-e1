@@ -24,6 +24,11 @@ class PivotalTracker
     api_request("/projects").parsed_response["projects"]
   end
 
+  def releases_for_project(project)
+    api_request("/projects/#{project["id"]}/stories",
+      :filter => "type:release").parsed_response["stories"]
+  end
+
   def status
     column_widths = [10, 30, 10, 8]
 
@@ -33,11 +38,12 @@ class PivotalTracker
 
   private
 
-  def next_deadline(project)
-    # response = api_request("#{API_BASE_URI}projects/#{project[:id]}/iterations")
-    #     puts response
-    # return response.xpath("2011-01-20"
-    "2011-01-20"
+  def next_deadline_for_project(project)
+    releases_for_project(project).each do |release|
+      if release["deadline"]
+        return release if Date.parse(release["deadline"].to_s) >= Date.today
+      end
+    end
   end
 
   def print_project_status_header(projects, column_widths)
@@ -48,6 +54,7 @@ class PivotalTracker
     @output.print "next deadline".ljust(column_widths[3])
     @output.puts ""
     60.times { |num| @output.print "-" }
+
     @output.puts ""
   end
 
@@ -55,7 +62,11 @@ class PivotalTracker
     @output.print project["id"].ljust(column_widths[0])
     @output.print project["name"].ljust(column_widths[1])
     @output.print project["current_velocity"].ljust(column_widths[2])
-    @output.print next_deadline(project).ljust(column_widths[3])
+
+    next_deadline = next_deadline_for_project(project)
+    formatted_deadline = Date.parse(next_deadline["deadline"].to_s).strftime("%Y-%m-%d")
+    @output.print "#{formatted_deadline} (#{next_deadline["deadline"]})".ljust(column_widths[3])
+
     @output.puts ""
   end
 end

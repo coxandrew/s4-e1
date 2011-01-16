@@ -5,7 +5,9 @@
 X * Set up RSpec
 X * Swap out Nokogiri for hpricot
 X * Get list of projects with their IDs
-* Get velocity for a given project by ID
+X * Get next deadline for a given project by ID
+* Add command-line options for 'help', 'status'
+* Determine RED/GREEN/YELLOW status of a project based on deadline
 * Memoize projects method
 * Get status for a single project (based on next deadline)
 * Get status for all projects
@@ -15,10 +17,6 @@ X * Get list of projects with their IDs
 * Add team-based calculations for Velocity
   * Hard-coded list of projects
   * Read from YAML file
-
-### Command-line parsing
-
-* Look into optparse
 
 ## Output
 
