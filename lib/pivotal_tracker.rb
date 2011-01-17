@@ -10,6 +10,27 @@ class PivotalTracker
     @output = output
   end
 
+  def print_status
+    column_widths = [10, 30, 10, 13]
+    print_status_header(column_widths)
+
+    projects.each { |project| print_project_status(project, column_widths) }
+  end
+
+  def print_deadlines
+    column_widths = [12, 30]
+    print_deadlines_header(column_widths)
+
+    releases_with_deadlines.each do |release|
+      deadline = Date.parse(release["deadline"].to_s)
+      if deadline >= Date.today
+        print_deadline(release, deadline)
+      end
+    end
+  end
+
+  private
+
   def api_request(path, query = {})
     PivotalTracker.get(path,
       :headers => {
@@ -23,42 +44,22 @@ class PivotalTracker
     api_request("/projects").parsed_response["projects"]
   end
 
-  def releases_for_project(project)
-    api_request("/projects/#{project["id"]}/stories",
-      :filter => "type:release").parsed_response["stories"]
-  end
-
   def releases
     projects.collect do |project|
       project_releases = releases_for_project(project)
     end.flatten
   end
 
+  def releases_for_project(project)
+    api_request("/projects/#{project["id"]}/stories",
+      :filter => "type:release").parsed_response["stories"]
+  end
+
   def releases_with_deadlines
-    releases.select { |release| release["deadline"] }
-  end
-
-  def status
-    column_widths = [10, 30, 10, 8]
-
-    print_project_status_header(projects, column_widths)
-    projects.each { |project| print_project_line(project, column_widths) }
-  end
-
-  def deadlines
-    sorted_releases = releases_with_deadlines.sort_by do |release|
+    releases.select { |release| release["deadline"] }.sort_by do |release|
       Date.parse(release["deadline"].to_s)
     end
-
-    sorted_releases.each do |release|
-      deadline = Date.parse(release["deadline"].to_s)
-      if deadline >= Date.today
-        print_deadline(release, deadline)
-      end
-    end
   end
-
-  private
 
   def short_date(date)
     date.strftime("%Y-%m-%d")
@@ -72,19 +73,31 @@ class PivotalTracker
     end
   end
 
-  def print_project_status_header(projects, column_widths)
+  def print_deadlines_header(column_widths)
+    @output.puts ""
+    @output.print "date".ljust(column_widths[0])
+    @output.print "deadline".ljust(column_widths[1])
+    @output.puts ""
+    header_width = column_widths.inject { |sum, value| sum += value }
+    header_width.times { |num| @output.print "-" }
+
+    @output.puts ""
+  end
+
+  def print_status_header(column_widths)
     @output.puts ""
     @output.print "id".ljust(column_widths[0])
     @output.print "project".ljust(column_widths[1])
     @output.print "velocity".ljust(column_widths[2])
     @output.print "next deadline".ljust(column_widths[3])
     @output.puts ""
-    65.times { |num| @output.print "-" }
+    header_width = column_widths.inject { |sum, value| sum += value }
+    header_width.times { |num| @output.print "-" }
 
     @output.puts ""
   end
 
-  def print_project_line(project, column_widths)
+  def print_project_status(project, column_widths)
     @output.print project["id"].ljust(column_widths[0])
     @output.print project["name"].ljust(column_widths[1])
     @output.print project["current_velocity"].ljust(column_widths[2])

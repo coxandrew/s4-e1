@@ -19,7 +19,7 @@ My company would also like to be able to represent a high-level overview of all 
     166979    Scrapple             YELLOW   1 day behind   2011-01-20
 
     # Show detailed status of a single project
-    $ pt status --project 166983
+    $ pivotaltracker status --project 166983
 
     NAME:
       IO Pro Maintenance
@@ -34,17 +34,17 @@ My company would also like to be able to represent a high-level overview of all 
       10 story points
 
     # Show current velocity of a given project
-    $ pt velocity --project Scrapple
+    $ pivotaltracker velocity --project Scrapple
 
     10 story points / week
 
     # Show the current velocity of the UX team
-    $ pt velocity --team ux
+    $ pivotaltracker velocity --team ux
 
     14 story points / week
 
     # List the upcoming deadlines
-    $ pt deadlines
+    $ pivotaltracker deadlines
 
     2011-01-20 - Velocity 8.0-3 Code Complete
     2011-01-31 - Velocity 8.0-3 Last Possible Change

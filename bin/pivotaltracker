@@ -49,15 +49,15 @@ if __FILE__ == $0
       raise OptionParser::TooManyCommands
     elsif ARGV.length == 1
       pt = PivotalTracker.new(STDOUT)
-      pt.send(ARGV.first)
+      pt.send("print_#{ARGV.first}")
     elsif !options[:help]
-      Options.parse!(["-h"])
+      Options.parse!(["--help"])
     end
   rescue OptionParser::InvalidOption
-    puts "Invalid option"
-    Options.parse!(["-h"])
+    puts "\nInvalid option"
+    Options.parse!(["--help"])
   rescue OptionParser::TooManyCommands
-    puts "Too many commands"
-    Options.parse!(["-h"])
+    puts "\nToo many commands"
+    Options.parse!(["--help"])
   end
 end
