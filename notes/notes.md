@@ -9,10 +9,8 @@ X * 'deadlines' command
 
 ## MORNING
 
-* Add a whitelist of available commands
-* Memoize projects method
-* Add '--project' option for 'status'
-* Add '--project' option for 'deadlines'
+X * Add a whitelist of available commands
+X * Refactor to separate interface from model
 
 ## LATER
 
