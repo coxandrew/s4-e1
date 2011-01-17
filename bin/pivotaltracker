@@ -2,21 +2,29 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'pivotal_tracker'
 require 'optparse'
+require 'ostruct'
 require 'ap'
 
 class OptionParser::TooManyCommands < Exception; end
+class OptionParser::InvalidCommand < Exception; end
 
 class Options
-  def self.parse!(args)
+  attr_reader :commands
+
+  def initialize
+    @commands = []
+    @commands << OpenStruct.new(
+      :keyword => "status",
+      :description => "Show the high-level status of all projects"
+    )
+    @commands << OpenStruct.new(
+      :keyword => "deadlines",
+      :description => "List the upcoming deadlines for for all projects"
+    )
+  end
+
+  def parse!(args)
     options = {}
-
-    commands = <<EOS
-
-commands:
-    status                           Show the high-level status of all projects
-    deadlines                        List the upcoming deadlines for for all projects
-
-EOS
 
     optparse = OptionParser.new do |opts|
       opts.banner = "\nusage: pivotaltracker [OPTIONS] <command>"
@@ -27,10 +35,10 @@ EOS
       opts.on("-h", "--help", "Print this help") do
         options[:help] = true
         puts opts
-        puts commands
+        print_available_commands
       end
 
-      opts.on("-p", "--project PROJECT_NAME", "Limit command to a specific PROJECT (supports fuzzy matching)") do |team|
+      opts.on("-p", "--project PROJECT_ID", "Limit command to a specific PROJECT_ID") do |team|
         options[:team] = team
       end
     end
@@ -38,26 +46,50 @@ EOS
     optparse.parse!(args)
     return options
   end
+
+  private
+
+  def print_available_commands
+    puts "\ncommands:"
+
+    @commands.each do |command|
+      print "    #{command.keyword.ljust(33)}"
+      print command.description
+      puts ""
+    end
+  end
 end
 
 if __FILE__ == $0
   options = {}
   begin
-    options = Options.parse!(ARGV)
+    options = Options.new
+    used_options = options.parse!(ARGV)
 
     if ARGV.length > 1
       raise OptionParser::TooManyCommands
     elsif ARGV.length == 1
+      command = ARGV.first
+      valid_commands = options.commands.collect do |command|
+        command.keyword
+      end
+      if !valid_commands.include?(command)
+        raise OptionParser::InvalidCommand
+      end
+
       pt = PivotalTracker.new(STDOUT)
-      pt.send("print_#{ARGV.first}")
-    elsif !options[:help]
-      Options.parse!(["--help"])
+      pt.send("print_#{command}")
+    elsif !used_options[:help]
+      options.parse!(["--help"])
     end
+  rescue OptionParser::InvalidCommand
+    puts "\nInvalid command"
+    options.parse!(["--help"])
   rescue OptionParser::InvalidOption
     puts "\nInvalid option"
-    Options.parse!(["--help"])
+    options.parse!(["--help"])
   rescue OptionParser::TooManyCommands
     puts "\nToo many commands"
-    Options.parse!(["--help"])
+    options.parse!(["--help"])
   end
 end
