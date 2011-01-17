@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'pivotal_tracker'
+require 'optparse'
+require 'ap'
+
+class OptionParser::TooManyCommands < Exception; end
+
+class Options
+  def self.parse!(args)
+    options = {}
+
+    commands = <<EOS
+
+commands:
+    status                           Show the high-level status of all projects
+    deadlines                        List the upcoming deadlines for for all projects
+
+EOS
+
+    optparse = OptionParser.new do |opts|
+      opts.banner = "\nusage: pivotaltracker [OPTIONS] <command>"
+
+      opts.separator("")
+      opts.separator("options:")
+
+      opts.on("-h", "--help", "Print this help") do
+        options[:help] = true
+        puts opts
+        puts commands
+      end
+
+      opts.on("-p", "--project PROJECT_NAME", "Limit command to a specific PROJECT (supports fuzzy matching)") do |team|
+        options[:team] = team
+      end
+    end
+
+    optparse.parse!(args)
+    return options
+  end
+end
+
+if __FILE__ == $0
+  options = {}
+  begin
+    options = Options.parse!(ARGV)
+
+    if ARGV.length > 1
+      raise OptionParser::TooManyCommands
+    elsif ARGV.length == 1
+      pt = PivotalTracker.new(STDOUT)
+      pt.send(ARGV.first)
+    elsif !options[:help]
+      Options.parse!(["-h"])
+    end
+  rescue OptionParser::InvalidOption
+    puts "Invalid option"
+    Options.parse!(["-h"])
+  rescue OptionParser::TooManyCommands
+    puts "Too many commands"
+    Options.parse!(["-h"])
+  end
+end

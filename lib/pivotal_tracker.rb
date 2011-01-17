@@ -53,7 +53,7 @@ class PivotalTracker
     @output.print "velocity".ljust(column_widths[2])
     @output.print "next deadline".ljust(column_widths[3])
     @output.puts ""
-    60.times { |num| @output.print "-" }
+    65.times { |num| @output.print "-" }
 
     @output.puts ""
   end
@@ -65,7 +65,7 @@ class PivotalTracker
 
     next_deadline = next_deadline_for_project(project)
     formatted_deadline = Date.parse(next_deadline["deadline"].to_s).strftime("%Y-%m-%d")
-    @output.print "#{formatted_deadline} (#{next_deadline["deadline"]})".ljust(column_widths[3])
+    @output.print "#{formatted_deadline}".ljust(column_widths[3])
 
     @output.puts ""
   end
