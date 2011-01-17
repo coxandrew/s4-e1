@@ -18,6 +18,10 @@ module PivotalTracker
       releases.each { |release| print_deadline(release) }
     end
 
+    def print_velocity(velocity)
+      @output.puts velocity
+    end
+
     private
 
     def short_date(date)

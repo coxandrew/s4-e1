@@ -12,6 +12,15 @@ X * 'deadlines' command
 X * Add a whitelist of available commands
 X * Refactor to separate interface from model
 
+## AFTERNOON
+
+* Mock out accounts for printer spec so we don't have to hit the server
+* Add specs for:
+  * account
+  * project
+  * connection
+  * command
+
 ## LATER
 
 * Determine RED/GREEN/YELLOW status of a project based on deadline

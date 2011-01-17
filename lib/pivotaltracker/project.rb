@@ -14,6 +14,15 @@ module PivotalTracker
       projects.collect { |attributes| Project.new(attributes) }
     end
 
+    def velocity
+      response = @connection.request("/projects/#{@id}")
+      if response["message"] == "Resource not found"
+        raise "No project with id: #{@id}"
+      end
+
+      return response.parsed_response["project"]["current_velocity"]
+    end
+
     def releases
       @connection.request("/projects/#{@id}/stories",
         :filter => "type:release").parsed_response["stories"]

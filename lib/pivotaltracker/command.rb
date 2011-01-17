@@ -2,19 +2,25 @@ module PivotalTracker
   class OptionParser::InvalidCommand < Exception; end
 
   class Command
-    def self.status
-      account = Account.new
-      printer = Printer.new(STDOUT)
-      printer.print_status(account.projects)
+    def initialize
+      @account = Account.new
+      @printer = Printer.new(STDOUT)
     end
 
-    def self.deadlines
-      account = Account.new
-      printer = Printer.new(STDOUT)
-      printer.print_deadlines(account.upcoming_deadlines)
+    def status(options = {})
+      @printer.print_status(@account.projects)
     end
 
-    def self.method_missing(sym, *args, &block)
+    def deadlines(options = {})
+      @printer.print_deadlines(@account.upcoming_deadlines)
+    end
+
+    def velocity(options = {})
+      project = Project.new(options)
+      @printer.print_velocity(project.velocity)
+    end
+
+    def method_missing(sym, *args, &block)
       raise OptionParser::InvalidCommand
     end
   end

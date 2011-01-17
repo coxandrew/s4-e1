@@ -16,7 +16,8 @@ module PivotalTracker
 
         raise OptionParser::TooManyCommands if @args.length > 1
         if @args.length == 1
-          Command.send(@args.first)
+          command = Command.new
+          command.send(@args.first, options)
         elsif !options[:help]
           parse!(["--help"])
         end
@@ -48,6 +49,11 @@ module PivotalTracker
           puts opts
           print_available_commands
         end
+
+        opts.on("-p", "--project PROJECT_ID", "Limit command to a specific PROJECT_ID") do |project_id|
+          options["id"] = project_id
+        end
+
       end
 
       optparse.parse!(args)
@@ -73,6 +79,10 @@ module PivotalTracker
       commands << OpenStruct.new(
         :keyword => "deadlines",
         :description => "List the upcoming deadlines for for all projects"
+      )
+      commands << OpenStruct.new(
+        :keyword => "velocity",
+        :description => "With the --project option, show the velocity of a project"
       )
       return commands
     end
