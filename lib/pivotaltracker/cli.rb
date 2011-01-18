@@ -11,30 +11,30 @@ module PivotalTracker
 
     def run
       begin
-        options = parse!(@args)
+        options = parse(@args)
 
         raise OptionParser::TooManyCommands if @args.length > 1
         if @args.length == 1
           command = Command.new
           command.send(@args.first, options)
         elsif !options[:help]
-          parse!(["--help"])
+          parse(["--help"])
         end
       rescue OptionParser::InvalidCommand
         puts "\nInvalid command"
-        parse!(["--help"])
+        parse(["--help"])
       rescue OptionParser::InvalidOption
         puts "\nInvalid option"
-        parse!(["--help"])
+        parse(["--help"])
       rescue OptionParser::TooManyCommands
         puts "\nToo many commands"
-        parse!(["--help"])
+        parse(["--help"])
       end
     end
 
     private
 
-    def parse!(args)
+    def parse(args)
       options = {}
 
       optparse = OptionParser.new do |opts|

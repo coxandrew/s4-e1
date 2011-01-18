@@ -15,7 +15,7 @@ X * Refactor to separate interface from model
 ## PEER REVIEW
 
 X * Remove LOAD_PATH in favor of running with `ruby -Ilib`
-* Don't misuse the bang method convention
+X * Don't misuse the bang method convention
 * Use StringIO for testing Printer
 
 ## LATER
