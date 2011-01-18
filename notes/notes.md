@@ -12,7 +12,13 @@ X * 'deadlines' command
 X * Add a whitelist of available commands
 X * Refactor to separate interface from model
 
-## AFTERNOON
+## PEER REVIEW
+
+X * Remove LOAD_PATH in favor of running with `ruby -Ilib`
+* Don't misuse the bang method convention
+* Use StringIO for testing Printer
+
+## LATER
 
 * Mock out accounts for printer spec so we don't have to hit the server
 * Add specs for:
@@ -20,9 +26,6 @@ X * Refactor to separate interface from model
   * project
   * connection
   * command
-
-## LATER
-
 * Determine RED/GREEN/YELLOW status of a project based on deadline
 * 'velocity' command
 * Add team-based calculations for Velocity
