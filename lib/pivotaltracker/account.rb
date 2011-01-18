@@ -10,7 +10,7 @@ module PivotalTracker
 
     def releases
       projects.collect do |project|
-        project_releases = project.releases
+        project.releases
       end.flatten
     end
 
