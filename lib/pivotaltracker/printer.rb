@@ -58,8 +58,8 @@ module PivotalTracker
       @output.print project.velocity.ljust(column_widths[2])
 
       next_milestone = project.next_milestone
-      formatted_deadline = short_date(Date.parse(next_milestone["deadline"].to_s))
-      @output.print "#{formatted_deadline}".ljust(column_widths[3])
+      deadline = short_date(Date.parse(next_milestone["deadline"].to_s))
+      @output.print "#{deadline}".ljust(column_widths[3])
 
       @output.puts ""
     end

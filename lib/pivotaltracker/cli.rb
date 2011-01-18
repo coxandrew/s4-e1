@@ -1,6 +1,5 @@
 require 'optparse'
 require 'ostruct'
-require 'ap'
 
 module PivotalTracker
   class OptionParser::TooManyCommands < Exception; end
@@ -50,7 +49,8 @@ module PivotalTracker
           print_available_commands
         end
 
-        opts.on("-p", "--project PROJECT_ID", "Limit command to a specific PROJECT_ID") do |project_id|
+        opts.on("-p", "--project PROJECT_ID",
+          "Limit command to a specific PROJECT_ID") do |project_id|
           options["id"] = project_id
         end
 
