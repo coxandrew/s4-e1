@@ -58,8 +58,12 @@ module PivotalTracker
       @output.print project.velocity.ljust(column_widths[2])
 
       next_milestone = project.next_milestone
-      deadline = short_date(Date.parse(next_milestone["deadline"].to_s))
-      @output.print "#{deadline}".ljust(column_widths[3])
+      if next_milestone.length > 0
+        deadline = short_date(Date.parse(next_milestone["deadline"].to_s))
+        @output.print "#{deadline}".ljust(column_widths[3])
+      else
+        @output.print "NONE"
+      end
 
       @output.puts ""
     end
